@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            }
+        div{
+            margin: 8px;
+            }
+        img{
+            margin: 2px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="wraper">
+
+    </div>
+    <script>
+        var initHeight = 200
+        var usedWidth = 0 //当前行已占用宽度
+        var winWidth = $(window).width() - 20;
+        var num = 0 //当前行图片数量
+        var img = [];
+        var wraper = $('.wraper')
+
+
+        function addPic(){
+            var len = img.length;
+            var width = parseInt(Math.random() *400 + 100)
+            var height = parseInt(Math.random() * 400 + 100)
+            var url = "http://placekitten.com/" + width + "/" + height; // 图片的url
+            img[len] = $("<img src='" + url + "'>"); // 创建图片
+            img[len].w = width; // 当前图片的宽
+            img[len].h = height; // 当前图片的高
+            wraper.append(img[len]);
+            setPic(len);
+        }
+        function setPic(index){
+            var canUseWidth = winWidth -17 - num * 4; //当前行可用宽度
+            var width = img[index].w * initHeight /  img[index].h;//当height为initHeight时。当前图片将占用高度
+            var lastWidth = canUseWidth - usedWidth;//当前行剩余宽度
+            if(num && width < lastWidth){
+                num++;
+                usedWidth += width;
+            }else{
+                var height = initHeight * canUseWidth / usedWidth; // 重新设置当前行高度
+                // 遍历当前行
+                for (var i = index - num; i < index; i++) {
+                    img[i].height(height); // 设置图片高
+                    img[i].width(img[i].w * height / img[i].h); // 设置图片宽
+                }
+                num = 1;
+                usedWidth = width; // 更新已用宽
+                console.log(usedWidth)
+                }
+            }
+            (function(){
+                for(var i = 0;i< 30;i++){
+                    addPic();
+                }
+            })()
+            $(window).scroll(function () {
+                if ($(document).height() - $(window).scrollTop() < 1500) {
+                addPic();
+            }
+})
+        $(window).resize(function () {
+            if (winWidth !== $(window).width()) {
+                winWidth = $(window).width(); // 重新获取可视区的宽
+                $(document).scrollTop(0);
+                usedWidth = 0; // 重新设置当前行已占用宽度
+                num = 0; // 重新设置当前行图片数量
+        for (var i = 0; i < img.length; i++) {
+        setPic(i);
+        }
+    }
+    })
+    </script>
+</body>
+</html>
